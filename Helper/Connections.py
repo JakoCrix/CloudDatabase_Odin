@@ -4,6 +4,7 @@ from azure.keyvault.secrets import SecretClient
 import praw
 import pyodbc
 import time
+import sqlite3
 
 # %% PRAW Connection
 def connect_to_reddit():
@@ -59,5 +60,11 @@ def connect_to_odinprod():
         pyodbcodinprod_object = pyodbc.connect(pyodbcodinprod_str)
 
     return pyodbcodinprod_str, pyodbcodinprod_object
-# conn_reddit_str, conn_reddit_obj= connect_to_reddit()
+# conn_odin_str, conn_odin_obj= connect_to_odinprod()
 
+# %% SQLite Connection
+def connect_to_sqlite(Path_DB="D:\\DB_Odin\\Odin.db"):
+    OdinConnect = sqlite3.connect(Path_DB)
+
+    return(OdinConnect)
+# conn_sqlite_object= connect_to_sqlite()
