@@ -1,55 +1,71 @@
 # Admin
 from Helper.Connections import *
 import pandas as pd
+from sqlalchemy import create_engine
+from urllib import parse
 from datetime import datetime
+from dateutil import tz
 
-conn_sqlite_object= connect_to_sqlite()
-conn_reddit_object= connect_to_reddit()
 conn_odin_str, conn_odin_obj= connect_to_odinprod()
-cursor= conn_odin_obj.cursor()
 
-# SQL DB Datagrab
-tempquery1_submissiontracking= """SELECT * FROM Submission_Tracking"""
-SubmissionTracking_Raw = pd.read_sql_query(tempquery1_submissiontracking, conn_sqlite_object)
-SubmissionTracking = SubmissionTracking_Raw.copy()
+
+# SQL DB Extraction
+conn_sqlite_object= connect_to_sqlite()
+SubmissionTracking_Raw = pd.read_sql_query("""SELECT * FROM Submission_Tracking""",
+                                           conn_sqlite_object)
+SubmissionTracking1 = SubmissionTracking_Raw.copy()
 
 # %% Processing
 # -Subreddit Processing
-Temp_Subreddit= pd.read_sql_query("SELECT idsubreddit, idsubreddit_reddit FROM subreddit", conn_odin_obj)
+Temp_Subreddit= pd.read_sql_query("SELECT idsubreddit, idsubreddit_reddit FROM subreddit_info",
+                                  conn_odin_obj)
 
-SubmissionTracking2= pd.merge(left=SubmissionTracking, right= Temp_Subreddit, how="left",
-                              left_on= "ID_Subreddit", right_on= "idsubreddit_reddit")
-SubmissionTracking2
+SubmissionTracking1_Added= pd.merge(left=SubmissionTracking1, right= Temp_Subreddit, how="left",
+                                    left_on= "ID_Subreddit", right_on= "idsubreddit_reddit")
+SubmissionTracking1_Added.rename(columns= {"idsubreddit":"ID_Subreddit_FK"}, inplace=True)
+SubmissionTracking2= SubmissionTracking1_Added.copy()
 
-# TODO: continue here
+# -Submission Processing
+Temp_Submission= pd.read_sql_query("SELECT idsubmission, idsubmission_reddit FROM submission_info",
+                                   conn_odin_obj)
 
-
-tempquery3_subreddit= """SELECT * FROM Subreddit_Info"""
-Subreddit = pd.read_sql_query(tempquery3_subreddit, conn_sqlite_object)
-Subreddit = Subreddit.copy()
-
-
-SubmissionTracking["ID_Subreddit"].unique()
-
-
-# -Submission Datagrab
-tempquery2_submission= """SELECT * FROM Submission_Info"""
-Submission = pd.read_sql_query(tempquery2_submission, conn_sqlite_object)
-Submission2 = Submission.copy()
+SubmissionTracking2_Added= pd.merge(left=SubmissionTracking2, right= Temp_Submission, how="left",
+                                    left_on= "ID_Submission", right_on= "idsubmission_reddit")
+SubmissionTracking2_Added.rename(columns= {"idsubmission":"ID_Submission_FK"}, inplace=True)
+SubmissionTracking3= SubmissionTracking2_Added.copy()
 
 
+# -Additional Processing
+SubmissionTracking3["Stickied"]= 0
 
+def tempfunc_dtconversion_AUDtoUTC(Daterow):
+    # Daterow= SubmissionTracking3["LastFetched"][1000]
+    DateObj= datetime.strptime(Daterow, "%Y-%m-%d %H:%M")
+    DateObj = DateObj.replace(tzinfo=tz.gettz('Australia/Victoria')) 
+    DateObj=DateObj.astimezone(tz.gettz('UTC'))
+    return(DateObj.strftime("%Y-%m-%d %H:%M:%S"))
 
+SubmissionTracking3["LastFetched"]=SubmissionTracking3.apply(lambda row:tempfunc_dtconversion_AUDtoUTC(row["LastFetched"]), axis= 1)
 
+SubmissionTracking4= SubmissionTracking3[['ID_Submission_FK','ID_Subreddit_FK', 'LastFetched',
+                                          'NumComments', 'Score','UpvoteRatio',
+                                          "Stickied",'IsClosed']].copy()
+SubmissionTracking4.columns=["idsubmission", "idsubreddit", "lastfetched",
+                              "numcomments", "score", "upvoteratio",
+                              "stickied", "isclose"]
 
-SubmissionTracking2
+SubmissionTrackingFinal= SubmissionTracking4.copy()
+SubmissionTrackingFinal.dtypes
+# %% Insertion
+conn_odin_str, conn_odin_obj= connect_to_odinprod()
+cursor= conn_odin_obj.cursor()
+params = parse.quote_plus(conn_odin_str)
+engine = create_engine("mssql+pyodbc:///?odbc_connect={}".format(params), fast_executemany=True)
 
+SubmissionTrackingFinal.to_sql(name="submissiontracking", con=engine,
+                               method='multi', chunksize=150, index= False,
+                               if_exists="append")
 
+cursor.commit()
+conn_odin_obj.close()
 
-
-
-
-
-
-SubmissionTracking2["idsubmission"]= range(1, len(SubmissionTracking2)+1)
-SubmissionInfo2["originalcontent"]= False
