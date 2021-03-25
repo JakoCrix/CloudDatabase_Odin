@@ -1,4 +1,10 @@
-def ScrapeReddit_SubmissionviaSubreddit(Subreddit_Name, conn_reddit_object,MinimumComments=30):
+# %% Admin
+from datetime import datetime
+import pandas as pd
+import time
+import re
+
+def ScrapeReddit_SubmissionviaSubreddit(Subreddit_Name, conn_reddit_object, MinimumComments=30):
     # Subreddit_Name="stocks"; conn_reddit_object= connect_to_reddit(); MinimumComments=25
 
     # Scraping-Connection
