@@ -14,7 +14,7 @@ SubmissionInfo1 = SubmissionInfo_Raw.copy()
 # %% Processing
 SubmissionInfo1["idsubmission"]= range(1, len(SubmissionInfo1)+1)
 SubmissionInfo1["originalcontent"]= 0
-SubmissionInfo1["submissiontext"]= "Insert in the Future"
+SubmissionInfo1["submissiontext"]= None
 
 SubmissionInfo2= SubmissionInfo1[["idsubmission", "ID_Submission","Title","submissiontext",
                                   "CreatedDate", "URL", "originalcontent"]]
@@ -22,7 +22,7 @@ SubmissionInfo2.columns= ["idsubmission", "idsubmission_reddit","title","submiss
                           "createdatetime", "url", "originalcontent"]
 SubmissionFinal= SubmissionInfo2.copy()
 
-# %% Insertion
+# %% InsertionProcessing
 conn_odin_str, conn_odin_obj= connect_to_odinprod()
 cursor= conn_odin_obj.cursor()
 params = parse.quote_plus(conn_odin_str)

@@ -56,7 +56,7 @@ SubmissionTracking4.columns=["idsubmission", "idsubreddit", "lastfetched",
 
 SubmissionTrackingFinal= SubmissionTracking4.copy()
 SubmissionTrackingFinal.dtypes
-# %% Insertion
+# %% InsertionProcessing
 conn_odin_str, conn_odin_obj= connect_to_odinprod()
 cursor= conn_odin_obj.cursor()
 params = parse.quote_plus(conn_odin_str)

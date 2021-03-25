@@ -27,7 +27,7 @@ SubredditInfo2= SubredditInfo1[["idsubreddit", "ID_Subreddit", "createdatetime",
 SubredditInfo2.columns= ["idsubreddit", "idsubreddit_reddit", "createdatetime", "title", "url"]
 SubredditInfo_Final= SubredditInfo2.copy()
 
-# %% Insertion
+# %% InsertionProcessing
 conn_odin_str, conn_odin_obj= connect_to_odinprod()
 cursor= conn_odin_obj.cursor()
 

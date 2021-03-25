@@ -75,7 +75,7 @@ del [CommentsInfo_Raw, CommentsInfo_Raw2,
      CommentsInfo1, CommentsInfo2, CommentsInfo3, CommentsInfo4, CommentsInfo5]
 del [Comment_Raw, CommentsInfo1_Added, CommentsInfo3_Added]
 
-# %% Insertion
+# %% InsertionProcessing
 start_time = time.time()
 
 conn_odin_str, conn_odin_obj= connect_to_odinprod()

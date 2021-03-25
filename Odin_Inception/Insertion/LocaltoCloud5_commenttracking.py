@@ -23,7 +23,7 @@ commenttracking2= commenttracking1[["idcomment", "lastfetched", "score", "sticki
 CommentsInfo_Final= commenttracking2.copy()
 
 
-# %% Insertion
+# %% InsertionProcessing
 conn_odin_str, conn_odin_obj= connect_to_odinprod()
 cursor= conn_odin_obj.cursor()
 params = parse.quote_plus(conn_odin_str)
