@@ -53,11 +53,14 @@ def connect_to_odinprod():
 
     # PYODBC Object
     try:
+        print("Determining status of the database: ")
         pyodbcodinprod_object = pyodbc.connect(pyodbcodinprod_str)
     except:
-        print("Database is sleeping. Starting the Database up!")
-        time.sleep(30)
+        print("~Database is sleeping, Starting the Database up!")
+        time.sleep(60)
         pyodbcodinprod_object = pyodbc.connect(pyodbcodinprod_str)
+    finally:
+        print("~Odin Connection is ready!")
 
     return pyodbcodinprod_str, pyodbcodinprod_object
 # conn_odin_str, conn_odin_obj= connect_to_odinprod()
