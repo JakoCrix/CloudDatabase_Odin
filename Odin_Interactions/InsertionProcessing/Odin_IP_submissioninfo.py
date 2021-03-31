@@ -2,39 +2,43 @@
 from datetime import datetime
 import pandas as pd
 from Helper.Connections import *
-from Odin_Interactions.Extraction.ScrapeSubmissions import *
+# from Odin_Interactions.Extraction.ScrapeSubmissions import *
 
-def InsertionProcessing_subredditinfo(Submission_Raw_Df, conn_Object, conn_RedditObj):
-    pass
+# Function Starts
+def IP_submissioninfo(Submission_Raw_Df, conn_Object):
+    # deleteme, conn_Object= connect_to_odinprod(); conn_RedditObj= connect_to_reddit()
+    # Submission_Raw_Df= pd.read_csv("C:\\Users\\Andrew\\Documents\\GitHub\\CloudDatabase_Odin\\Odin_Interactions\\Insertion_Trial\\Submission_20210329.csv")
 
-# %% Admin
-deleteme, conn_Object= connect_to_odinprod()
-conn_RedditObj= connect_to_reddit()
-Submission_Raw_Df= ScrapeReddit_SubmissionviaSubreddit(Subreddit_Name="stocks", conn_reddit_object= conn_RedditObj, MinimumComments=25)
+    NewSubmissions= Submission_Raw_Df.copy()
 
-# %% Function Starts
-Submission_Raw_Df.dtypes
-CurrentTable= pd.read_sql_query("SELECT idsubmission, idsubmission_reddit FROM submission_info", conn_Object)
-CurrentTable
+    # Identifying New Submissions through "DropMe" column
+    Temp_EarliestSubmission = datetime.utcfromtimestamp(
+        int(min(Submission_Raw_Df.Submission_UTCCreationTime))).strftime('%Y-%m-%d %H:%M:%S')
+    CurrentTable = pd.read_sql_query("SELECT idsubmission, idsubmission_reddit, createdatetime FROM submission_info "+
+                                     "WHERE createdatetime >= '{}'".format(Temp_EarliestSubmission),
+                                     conn_Object)
 
-processed_SRinfo= pd.DataFrame()
+    NewSubmissions["DropMe"] = NewSubmissions["Submission_ID"].isin(CurrentTable["idsubmission_reddit"].tolist())
+    NewSubmissions= NewSubmissions.sort_values("Submission_UTCCreationTime", ascending=True).reset_index(drop=True)
 
-NewSubmissions.dtypes
-NewSubmissions= Submission_Raw_Df.[Submission_Raw_Df["Submission_ID"].isin(CurrentTable["idsubmission_reddit"].tolist())==False].copy()
-NewSubmissions= NewSubmissions["Submission_ID", "Submission_Title", ]
+    # Processing into odin format
+    NewSubmissions["idsubmission"] = range(max(CurrentTable.idsubmission) + 1, max(CurrentTable.idsubmission) + len(NewSubmissions) + 1)
+    def tempfunc_utctodatetime(utcInt):
+        utcdatetime = datetime.utcfromtimestamp(int(utcInt)).strftime('%Y-%m-%d %H:%M:%S')
+        return utcdatetime
+    NewSubmissions["createdatetime"] = NewSubmissions.apply(lambda row: tempfunc_utctodatetime(row['Submission_UTCCreationTime']), axis=1)
+    NewSubmissions["Submission_OriginalContent"]= NewSubmissions["Submission_OriginalContent"].astype(int)
 
 
-for SubredditsofInterest in All_Subreddits:
-    # SubredditsofInterest= All_Subreddits[0]
-    if SubredditsofInterest not in CurrentTable.title.to_list():
-        # InsertionProcessing Prep
-        Insertion_Df= pd.DataFrame(data={"idsubreddit": [max(CurrentTable.idsubreddit)+1],
-                           "idsubreddit_reddit":[SubredditsofInterest],
-                           "createdatetime":[datetime.utcfromtimestamp(
-                               int(conn_RedditObj.subreddit(SubredditsofInterest).created_utc)).strftime(
-                               '%Y-%m-%d %H:%M:%S')],
-                           "title":[SubredditsofInterest],
-                           "url":["https://www.reddit.com/r/" + SubredditsofInterest]
-                           })
+    # Finalizing and Returning
+    NewSubmissions2 = NewSubmissions[["DropMe", "idsubmission", "Submission_ID", "Submission_Title", "Submission_Selftext",
+                                      "createdatetime", "Submission_URL", "Submission_OriginalContent"]].copy()
+    NewSubmissions2.columns = ["DropMe", "idsubmission", "idsubmission_reddit", "title", "submissiontext",
+                               "createdatetime", "url", "originalcontent"]
 
-    processed_SRinfo= processed_SRinfo.append(Insertion_Df)
+    processed_submissioninfo= NewSubmissions2[NewSubmissions2.DropMe==False].copy()
+
+    return processed_submissioninfo
+
+
+

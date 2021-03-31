@@ -5,9 +5,11 @@ from Helper.Connections import *
 from Odin_Interactions.Extraction.ScrapeSubmissions import *
 
 # Function Starts
-def InsertionProcessing_subredditinfo(Submission_Raw_Df, conn_Object, conn_RedditObj):
+def IP_subredditinfo(Submission_Raw_Df,
+                     conn_Object,
+                     conn_RedditObj):
     # deleteme, conn_Object= connect_to_odinprod(); conn_RedditObj= connect_to_reddit()
-    # Submission_Raw_Df= ScrapeReddit_SubmissionviaSubreddit(Subreddit_Name="ASX_Bets", conn_reddit_object= conn_RedditObj, MinimumComments=25)
+    # Submission_Raw_Df= pd.read_csv("C:\\Users\\Andrew\\Documents\\GitHub\\CloudDatabase_Odin\\Odin_Interactions\\Insertion_Trial\\Submission_20210329.csv")
 
     # Extraction
     All_Subreddits= Submission_Raw_Df["Subreddit_Name"].unique()
@@ -19,29 +21,19 @@ def InsertionProcessing_subredditinfo(Submission_Raw_Df, conn_Object, conn_Reddi
         # SubredditsofInterest= All_Subreddits[0]
         if SubredditsofInterest not in CurrentTable.title.to_list():
             # InsertionProcessing Prep
-            Insertion_Df= pd.DataFrame(data={"idsubreddit": [max(CurrentTable.idsubreddit)+1],
-                               "idsubreddit_reddit":[SubredditsofInterest],
-                               "createdatetime":[datetime.utcfromtimestamp(
-                                   int(conn_RedditObj.subreddit(SubredditsofInterest).created_utc)).strftime(
-                                   '%Y-%m-%d %H:%M:%S')],
-                               "title":[SubredditsofInterest],
-                               "url":["https://www.reddit.com/r/" + SubredditsofInterest]
-                               })
+            Insertion_Df= pd.DataFrame(data={
+                "idsubreddit": [max(CurrentTable.idsubreddit)+1],
+                "idsubreddit_reddit":[
+                    conn_RedditObj.subreddit(SubredditsofInterest).id],
+                "createdatetime":[datetime.utcfromtimestamp(int(
+                    conn_RedditObj.subreddit(SubredditsofInterest).created_utc)).strftime('%Y-%m-%d %H:%M:%S')],
+                "title":[SubredditsofInterest],
+                "url":["https://www.reddit.com/r/" + SubredditsofInterest]
+            })
 
-        processed_SRinfo= processed_SRinfo.append(Insertion_Df)
-
+            processed_SRinfo= processed_SRinfo.append(Insertion_Df)
 
     return(processed_SRinfo)
-
-
-
-
-
-
-
-
-
-
 
 
 

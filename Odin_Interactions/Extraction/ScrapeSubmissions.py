@@ -28,8 +28,8 @@ def ScrapeReddit_SubmissionviaSubreddit(Subreddit_Name, conn_reddit_object, Mini
         try:
             if submission.num_comments >= MinimumComments:
                 Temp_data.append([tempself_SubredditID, tempself_SubredditName,
-                                  submission.id, submission.title, submission.url, submission.stickied, submission.created_utc,
-                                  tempself_CurrentUTC, submission.num_comments, submission.score, submission.upvote_ratio
+                                  submission.id, submission.title, submission.selftext, submission.url, submission.stickied, submission.created_utc,
+                                  tempself_CurrentUTC, submission.num_comments, submission.score, submission.upvote_ratio, submission.is_original_content
                                   ])
                 # Tracking
                 temp_SubmissionHaveContent += 1
@@ -51,8 +51,8 @@ def ScrapeReddit_SubmissionviaSubreddit(Subreddit_Name, conn_reddit_object, Mini
 
 
     df = pd.DataFrame(Temp_data, columns=['Subreddit_ID', 'Subreddit_Name',
-                                          'Submission_ID','Submission_Title','Submission_URL','Submission_Stickied','Submission_UTCCreationTime',
-                                          'Submission_UTCFetchTime', 'Submission_NumComments', "Submission_Score",'Submission_UpvoteRatio'])
+                                          'Submission_ID','Submission_Title','Submission_Selftext','Submission_URL','Submission_Stickied','Submission_UTCCreationTime',
+                                          'Submission_UTCFetchTime', 'Submission_NumComments', "Submission_Score",'Submission_UpvoteRatio', 'Submission_OriginalContent'])
 
     return df
 
