@@ -69,27 +69,19 @@ CommentsInfo5.columns= ["idcomment", "idcomment_reddit", "idsubmission", "idsubr
 
 
 CommentsInfo_Final= CommentsInfo5.copy()
-CommentsInfo_Final.dtypes
 
-del [CommentsInfo_Raw, CommentsInfo_Raw2,
-     CommentsInfo1, CommentsInfo2, CommentsInfo3, CommentsInfo4, CommentsInfo5]
+del [CommentsInfo_Raw, CommentsInfo_Raw2,CommentsInfo1, CommentsInfo2, CommentsInfo3, CommentsInfo4, CommentsInfo5]
 del [Comment_Raw, CommentsInfo1_Added, CommentsInfo3_Added]
 
 # %% InsertionProcessing
 start_time = time.time()
+print("Starting the insertion process")
 
 conn_odin_str, conn_odin_obj= connect_to_odinprod()
 cursor= conn_odin_obj.cursor()
 params = parse.quote_plus(conn_odin_str)
 engine = create_engine("mssql+pyodbc:///?odbc_connect={}".format(params), fast_executemany=True)
-
-# Splitting into
-len(CommentsInfo_Final)/1000000
-CommentsInfo_Final[1:1000000].to_sql(name="comment_info", con=engine, chunksize=1000, index= False,if_exists="append")
-CommentsInfo_Final[1000001:2000000].to_sql(name="comment_info", con=engine, chunksize=5000, index= False,if_exists="append")
-CommentsInfo_Final[2000001:3000000].to_sql(name="comment_info", con=engine, chunksize=10000, index= False,if_exists="append")
-CommentsInfo_Final[3000001:4000000].to_sql(name="comment_info", con=engine, chunksize=20000, index= False,if_exists="append")
-CommentsInfo_Final[4000001:].to_sql(name="comment_info", con=engine, chunksize=50000, index= False,if_exists="append")
+CommentsInfo_Final.to_sql(name="comment_info", con=engine, chunksize=100000, index= False, if_exists="append")
 
 cursor.commit()
 conn_odin_obj.close()

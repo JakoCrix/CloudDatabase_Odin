@@ -62,9 +62,7 @@ cursor= conn_odin_obj.cursor()
 params = parse.quote_plus(conn_odin_str)
 engine = create_engine("mssql+pyodbc:///?odbc_connect={}".format(params), fast_executemany=True)
 
-SubmissionTrackingFinal.to_sql(name="submissiontracking", con=engine,
-                               method='multi', chunksize=150, index= False,
-                               if_exists="append")
+SubmissionTrackingFinal.to_sql(name="submissiontracking", con=engine, chunksize=100000, index= False,if_exists="append")
 
 cursor.commit()
 conn_odin_obj.close()

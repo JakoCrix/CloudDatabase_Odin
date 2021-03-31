@@ -5,7 +5,6 @@ from Helper.Connections import connect_to_odinprod
 conn_odin_str, conn_odin_obj= connect_to_odinprod()
 cursor= conn_odin_obj.cursor()
 
-
 # %% Subreddit Info Table
 #cursor.execute("""DROP TABLE subreddit_info""")
 cursor.execute("""CREATE TABLE subreddit_info (
@@ -25,7 +24,7 @@ cursor.execute("""CREATE TABLE submission_info (
                     title VARCHAR(350) NOT NULL,
                     submissiontext VARCHAR(MAX) NULL,
                     createdatetime DATETIME NOT NULL,
-                    url text NOT NULL,
+                    url VARCHAR(MAX) NOT NULL,
                     originalcontent BIT NOT NULL
                     );""")
 conn_odin_obj.commit()
