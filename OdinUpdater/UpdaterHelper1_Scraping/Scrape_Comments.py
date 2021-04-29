@@ -4,7 +4,7 @@ import pandas as pd
 import time
 import re
 
-from Helper.Connections import connect_to_reddit
+# from Helper.Connections_Scraping import *
 
 # %% Scraping Functions
 def ScrapeReddit_CommentsviaSubmission(SubmissionID_str, conn_reddit_object):
