@@ -1,13 +1,12 @@
 # %% Admin
 from datetime import datetime
 import pandas as pd
-from Helper.Connections import *
+# from Helper.Connections_Database import *
 # from Odin_Interactions.Extraction.ScrapeSubmissions import *
 
 # Initial Processing
 def IP_submissiontracking_reshape(Submission_Raw_Df, conn_Object):
-    # deleteme, conn_Object= connect_to_odinprod()
-    # Submission_Raw_Df= pd.read_csv("C:\\Users\\Andrew\\Documents\\GitHub\\CloudDatabase_Odin\\Odin_Interactions\\Insertion_Trial\\Submission_20210329.csv")
+    # deleteme, conn_Object= connect_to_odinprod(); Submission_Raw_Df= Submission_Df
 
     # Extracting the relevant keys
     Temp_EarliestSubmission = datetime.utcfromtimestamp(int(min(Submission_Raw_Df.Submission_UTCCreationTime))).strftime('%Y-%m-%d %H:%M:%S')
@@ -16,14 +15,15 @@ def IP_submissiontracking_reshape(Submission_Raw_Df, conn_Object):
     Temp_subredditinfo= pd.read_sql_query("SELECT idsubreddit, idsubreddit_reddit FROM subreddit_info", conn_Object)
 
     Submission_Raw_Df2_FK1= pd.merge(left= Submission_Raw_Df, right= Temp_submissioninfo, how="left",
-                                 left_on="Submission_ID", right_on="idsubmission_reddit")
+                                     left_on="Submission_ID", right_on="idsubmission_reddit")
     Submission_Raw_Df2_FK1andFK2= pd.merge(left= Submission_Raw_Df2_FK1, right= Temp_subredditinfo, how="left",
                                  left_on="Subreddit_ID", right_on="idsubreddit_reddit")
     Submission_Raw_Df2= Submission_Raw_Df2_FK1andFK2.copy()
     Submission_Raw_Df2["isclose"]=0
     Submission_Raw_Df2["Submission_Stickied"]= Submission_Raw_Df2["Submission_Stickied"].astype(int)
 
-    Submission_Raw_Df2["lastfetched"] = datetime.utcfromtimestamp(int(Submission_Raw_Df2["Submission_UTCFetchTime"].unique())).strftime('%Y-%m-%d %H:%M:%S')
+    Submission_Raw_Df2["lastfetched"] = datetime.utcfromtimestamp(max(Submission_Raw_Df2["Submission_UTCFetchTime"].astype(int))).\
+        strftime('%Y-%m-%d %H:%M:%S')
 
     # Processing the final submissions
     Submission_Raw_Df3= Submission_Raw_Df2[["idsubmission","idsubreddit",
@@ -38,8 +38,8 @@ def IP_submissiontracking_reshape(Submission_Raw_Df, conn_Object):
 # Function 1
 # This function works towards removing all submissions that have already been closed.
 def IP_submissiontracking_exclusions(Submission_Raw_Df, conn_Object):
-    # deleteme, conn_Object= connect_to_odinprod()
-    # Submission_Raw_Df= Insertme_SubmissionTracking
+    # deleteme, conn_Object= connect_to_odinprod(); Submission_Raw_Df= Insertme_SubmissionTracking
+
     Processing1_1 = Submission_Raw_Df.copy()
 
     # Extracting Closed Submissions
@@ -53,24 +53,26 @@ def IP_submissiontracking_exclusions(Submission_Raw_Df, conn_Object):
     Processing1_Final.rename(columns={'isclose_Updated': 'isclose'}, inplace=True)
 
     print("Processing 1 Complete- Excluding Closed Submissions:" +
-          "\n- {} of {} submissions has already been closed".format(sum(Processing1_1["isclose"]),len(Processing1_1)) +
+          "\n- {} of {} submissions has already been closed".format(sum(Processing1_Final["isclose"]),len(Processing1_1)) +
           "\n- {} submissions to process ".format(len(Processing1_Final) - sum(Processing1_Final["isclose"]))
           )
+
+    Processing1_Final= Processing1_Final[Processing1_Final["isclose"]==0]
 
     return Processing1_Final
 
 
 # Function 2
 def IP_submissiontracking_PotentialClosures(Submission_Raw_Df, conn_Object):
-    # deleteme, conn_Object= connect_to_odinprod()
-    # Submission_Raw_Df= Insertme_SubmissionTracking2
+    # conn_Object= conn_odin_obj; Submission_Raw_Df= Insertme_SubmissionTracking2
+
 
     Processing2_1 = Submission_Raw_Df.copy()
     Processing2_1["DatabaseExistence"]= "New"
 
     # Extracting Submissions
     print("Processing 2 Started- Modifying Potential Closures IsClosed:")
-    Temp_RedditSubmissions= "'"+ "','".join(str(e) for e in Processing2_1["idsubmission"].tolist())+ "'"
+    Temp_RedditSubmissions= "'"+ "','".join(str(e) for e in Processing2_1["idsubmission"].dropna().astype(int).tolist())+ "'"
     TempSQL_IsCloseModifier = "SELECT * , 'Exists' as DatabaseExistence FROM submissiontracking WHERE idsubmission IN ({})""".format(Temp_RedditSubmissions)
     PotentialSubmissionsToClose = pd.read_sql_query(TempSQL_IsCloseModifier, conn_Object)
 

@@ -1,8 +1,7 @@
 # %% Admin
 from datetime import datetime
 import pandas as pd
-from Helper.Connections import *
-from Odin_Interactions.Extraction.ScrapeSubmissions import *
+# from Helper.Connections_Database import *
 
 # Function Starts
 def IP_subredditinfo(Submission_Raw_Df,

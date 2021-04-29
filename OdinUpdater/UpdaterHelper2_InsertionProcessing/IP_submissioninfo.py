@@ -1,7 +1,6 @@
 # %% Admin
 from datetime import datetime
 import pandas as pd
-from Helper.Connections import *
 # from Odin_Interactions.Extraction.ScrapeSubmissions import *
 
 # Function Starts
@@ -37,6 +36,7 @@ def IP_submissioninfo(Submission_Raw_Df, conn_Object):
                                "createdatetime", "url", "originalcontent"]
 
     processed_submissioninfo= NewSubmissions2[NewSubmissions2.DropMe==False].copy()
+    processed_submissioninfo.drop("DropMe", axis=1, inplace=True)
 
     return processed_submissioninfo
 
