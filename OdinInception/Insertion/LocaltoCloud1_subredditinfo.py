@@ -1,8 +1,8 @@
 # Admin
-from Helper.Connections import *
+from Helper.Connections_Database import *
+from Helper.Connections_Scraping import *
 import pandas as pd
 from datetime import datetime
-
 
 # %% SQL DB Extraction
 conn_sqlite_object= connect_to_sqlite()
@@ -11,7 +11,7 @@ SubredditInfo_Raw = pd.read_sql_query("""SELECT * FROM Subreddit_Info""",
 SubredditInfo1 = SubredditInfo_Raw.copy()
 
 # %% Processing
-conn_reddit_object= connect_to_reddit()
+conn_reddit_object= redditconnect_PRAW()
 SubredditInfo1["idsubreddit"]= range(1, len(SubredditInfo1)+1)
 
 def tempfunc_utctodatetime(subredditid):

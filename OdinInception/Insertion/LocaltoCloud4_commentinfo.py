@@ -1,5 +1,5 @@
 # Admin
-from Helper.Connections import *
+from Helper.Connections_Database import *
 import pandas as pd
 from sqlalchemy import create_engine
 from urllib import parse
@@ -17,7 +17,7 @@ Comment_Raw = pd.read_sql_query("""SELECT * FROM Comment""", conn_sqlite_object)
 CommentsInfo_Raw= pd.merge(left=CommentInformation_Raw, right=Comment_Raw, how="left",
                            left_on="ID_Comment", right_on="ID_Comment")
 
-CommentsInfo_Raw2=CommentsInfo_Raw.sort_values('created_utc', ascending=False).drop_duplicates('ID_Comment').reset_index(drop=True)
+CommentsInfo_Raw2=CommentsInfo_Raw.sort_values('created_utc').drop_duplicates('ID_Comment').reset_index(drop=True)
 
 CommentsInfo1= CommentsInfo_Raw2.copy()
 
@@ -72,6 +72,9 @@ CommentsInfo_Final= CommentsInfo5.copy()
 
 del [CommentsInfo_Raw, CommentsInfo_Raw2,CommentsInfo1, CommentsInfo2, CommentsInfo3, CommentsInfo4, CommentsInfo5]
 del [Comment_Raw, CommentsInfo1_Added, CommentsInfo3_Added]
+
+
+
 
 # %% InsertionProcessing
 start_time = time.time()

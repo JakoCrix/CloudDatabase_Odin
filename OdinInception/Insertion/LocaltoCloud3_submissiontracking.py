@@ -1,5 +1,5 @@
 # Admin
-from Helper.Connections import *
+from Helper.Connections_Database import *
 import pandas as pd
 from sqlalchemy import create_engine
 from urllib import parse
@@ -55,7 +55,7 @@ SubmissionTracking4.columns=["idsubmission", "idsubreddit", "lastfetched",
                               "stickied", "isclose"]
 
 SubmissionTrackingFinal= SubmissionTracking4.copy()
-SubmissionTrackingFinal.dtypes
+
 # %% InsertionProcessing
 conn_odin_str, conn_odin_obj= connect_to_odinprod()
 cursor= conn_odin_obj.cursor()
