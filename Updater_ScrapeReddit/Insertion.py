@@ -12,13 +12,13 @@ sys.path.append('C:\\Users\\Andrew\\Documents\\GitHub\\CloudDatabase_Odin')
 from Helper.Connections_Database import *
 from Helper.Connections_Scraping import *
 
-from OdinUpdater.UpdaterHelper1_Scraping.Scrape_Submissions import *
-from OdinUpdater.UpdaterHelper1_Scraping.Scrape_Comments import *
+from Helper.ScrapePRAW_Comments import *
+from Helper.ScrapePRAW_Submissions import *
 
-from OdinUpdater.UpdaterHelper2_InsertionProcessing.IP_submissioninfo import IP_submissioninfo
-from OdinUpdater.UpdaterHelper2_InsertionProcessing.IP_subredditinfo import IP_subredditinfo
-from OdinUpdater.UpdaterHelper2_InsertionProcessing.IP_submissiontracking import *
-from OdinUpdater.UpdaterHelper2_InsertionProcessing.IP_commentinfo_commenttracking import *
+from Updater_ScrapeReddit.Helper_InsertionProcessing.IP_submissioninfo import IP_submissioninfo
+from Updater_ScrapeReddit.Helper_InsertionProcessing.IP_subredditinfo import IP_subredditinfo
+from Updater_ScrapeReddit.Helper_InsertionProcessing.IP_submissiontracking import *
+from Updater_ScrapeReddit.Helper_InsertionProcessing.IP_commentinfo_commenttracking import *
 
 
 # Connections
