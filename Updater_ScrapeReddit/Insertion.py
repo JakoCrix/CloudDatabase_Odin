@@ -28,7 +28,6 @@ cursor = conn_odin_obj.cursor()
 params = parse.quote_plus(conn_odin_str)
 engine = create_engine("mssql+pyodbc:///?odbc_connect={}".format(params), fast_executemany=True)
 
-
 # Admin Specifications
 Temp_SubredditList = ["stocks",
                       "investing",
