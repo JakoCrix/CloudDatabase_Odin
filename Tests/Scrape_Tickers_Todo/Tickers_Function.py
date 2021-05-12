@@ -20,11 +20,12 @@ def NasdaqTickers_Webscrape(Exchange_OfInterest= "All"):
                "Amex":   "https://old.nasdaq.com/screening/companies-by-name.aspx?letter=0&exchange=amex&render=download",
                "NYSE":   "https://old.nasdaq.com/screening/companies-by-name.aspx?letter=0&exchange=nyse&render=download"}
 
-    if   Exchange_OfInterest != "All" and Exchange_OfInterest not in list(UrlLinks.keys()):
+    if Exchange_OfInterest != "All" and \
+            Exchange_OfInterest not in list(UrlLinks.keys()):
         print("Invalid Exchange listed, please insert: {}".format(", ".join(list(UrlLinks.keys()))))
         pass
 
-    elif Exchange_OfInterest != "All" and Exchange_OfInterest in list(UrlLinks.keys()) :
+    elif Exchange_OfInterest != "All" and Exchange_OfInterest in list(UrlLinks.keys()):
         print("Valid Exchange listed")
         print("- extracting {} tickers".format(Exchange_OfInterest))
         URLRaw = requests.get(UrlLinks[Exchange_OfInterest], headers=Temp_getheaders)

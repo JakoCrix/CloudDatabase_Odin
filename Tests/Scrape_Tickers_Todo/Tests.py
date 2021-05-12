@@ -1,5 +1,5 @@
 # Admin
-from Tests.Scrape_Tickers.Tickers_Function import *
+from Tests.Scrape_Tickers_Todo.Tickers_Function import *
 
 # Testing
 Tickers_Raw = NasdaqTickers_Webscrape("All")
