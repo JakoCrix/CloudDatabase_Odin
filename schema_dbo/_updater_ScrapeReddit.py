@@ -4,7 +4,7 @@
 from sqlalchemy import create_engine
 from urllib import parse
 import sys
-sys.path.append('/')
+sys.path.append('C:\\Users\\Andrew\\Documents\\GitHub\\CloudDatabase_Odin')
 
 # Helper Files
 from Helper.Connections_Database import *
