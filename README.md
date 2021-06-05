@@ -4,7 +4,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/JakoCrix/CloudDatabase_Odin">
-    <img src="admin/md_pic.png" alt="Logo" width="80" height="80">
+    <img src="admin_repo/md_pic.png" alt="Logo" width="80" height="80">
   </a>
   <h3 align="center">CloudDatabase_Odin</h3>
   <p align="center">
